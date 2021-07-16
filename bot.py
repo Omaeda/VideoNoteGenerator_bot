@@ -1,8 +1,9 @@
 import logging
 import os
 
-import crop_video
 from aiogram import Bot, Dispatcher, executor, types
+
+import crop_video
 
 API_TOKEN = 'BOT TOKEN HERE'
 
@@ -27,9 +28,13 @@ async def convert(message: types.Message):
     user_id = message.from_user.id
     with open(f"file_{user_id}.mp4", "wb") as f:
         await bot.download_file_by_id(message.video.file_id, f)
-    crop_video.crop(f"file_{user_id}.mp4", f"new_file_{user_id}.mp4")
+    size, duration = crop_video.video_crop(f"file_{user_id}.mp4", f"new_file_{user_id}.mp4")
     with open(f"new_file_{user_id}.mp4", "rb") as file:
-        await message.answer_video_note(file)
+        await message.answer_video_note(
+            video_note=file,
+            duration=duration,
+            length=size
+        )
     try:
         os.remove(f"file_{user_id}.mp4")
         os.remove(f"new_file_{user_id}.mp4")

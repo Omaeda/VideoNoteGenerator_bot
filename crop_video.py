@@ -1,56 +1,12 @@
-import cv2
+import moviepy.editor as mp
 
 
-def crop(source_video, dest_video):
-    # Open the video
-    cap = cv2.VideoCapture(source_video)
-
-    # Initialize frame counter
-    cnt = 0
-
-    # Some characteristics from the original video
-    w_frame, h_frame = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps, frames = cap.get(cv2.CAP_PROP_FPS), cap.get(cv2.CAP_PROP_FRAME_COUNT)
-
-    min_s = w_frame if w_frame < h_frame else h_frame
-    # Here you can define your croping values
-    x, y, h, w = 0, 0, min_s, min_s
-
-    # output
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')  # XVID
-    out = cv2.VideoWriter(dest_video, fourcc, fps, (w, h))
-
-    # Now we start
-    while (cap.isOpened()):
-        ret, frame = cap.read()
-
-        cnt += 1  # Counting frames
-
-        # Avoid problems when video finish
-        if ret == True:
-            # Croping the frame
-            crop_frame = frame[y:y + h, x:x + w]
-
-            # Percentage
-            # xx = cnt *100/frames
-            # print(int(xx),'%')
-
-            # Saving from the desired frames
-            # if 15 <= cnt <= 90:
-            #    out.write(crop_frame)
-
-            # I see the answer now. Here you save all the video
-            out.write(crop_frame)
-
-            # Just to see the video in real time
-            # cv2.imshow('frame',frame)
-            # cv2.imshow('croped',crop_frame)
-
-            # if cv2.waitKey(1) & 0xFF == ord('q'):
-            #     break
-        else:
-            break
-
-    cap.release()
-    out.release()
-    cv2.destroyAllWindows()
+def video_crop(base_video, out_video):
+    clip = mp.VideoFileClip(base_video)
+    width, height = clip.size
+    xcenter = width // 2
+    ycenter = height // 2
+    min_size = height if height < width else width
+    clip_resized = clip.crop(width=min_size, height=min_size, x_center=xcenter, y_center=ycenter)
+    clip_resized.write_videofile(out_video)
+    return min_size, clip.duration
