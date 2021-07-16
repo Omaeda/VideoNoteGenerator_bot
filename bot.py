@@ -2,16 +2,22 @@ import logging
 import os
 
 from aiogram import Bot, Dispatcher, executor, types
+from decouple import config
 
 import crop_video
 
-API_TOKEN = 'BOT TOKEN HERE'
+try:
+    bot_token = config("BOT_TOKEN")
+    bot = Bot(token=bot_token)
+except:
+    logging.error("Faltan las variables de entorno")
+    exit()
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 
 # Initialize bot and dispatcher
-bot = Bot(token=API_TOKEN)
+
 dp = Dispatcher(bot)
 
 

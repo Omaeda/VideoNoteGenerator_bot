@@ -1,2 +1,3 @@
 aiogram
 moviepy
+python-decouple
