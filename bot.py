@@ -38,8 +38,7 @@ async def convert(message: types.Message):
     with open(f"new_file_{user_id}.mp4", "rb") as file:
         await message.answer_video_note(
             video_note=file,
-            duration=duration,
-            length=size
+            duration=duration
         )
     try:
         os.remove(f"file_{user_id}.mp4")
