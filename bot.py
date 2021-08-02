@@ -1,5 +1,7 @@
 import logging
+import tempfile
 import os
+
 
 from aiogram import Bot, Dispatcher, executor, types
 from decouple import config
@@ -26,25 +28,26 @@ async def send_welcome(message: types.Message):
     """
     This handler will be called when user sends `/start` or `/help` command
     """
-    await message.reply("Hi!\nI'm EchoBot!\nPowered by aiogram.")
+    await message.reply(("I am a bot, I can convert video messages in video notes.\n\n"
+                         "Please use short videos"))
 
 
 @dp.message_handler(content_types=["video"])
 async def convert(message: types.Message):
-    user_id = message.from_user.id
-    with open(f"file_{user_id}.mp4", "wb") as f:
-        await bot.download_file_by_id(message.video.file_id, f)
-    size, duration = crop_video.video_crop(f"file_{user_id}.mp4", f"new_file_{user_id}.mp4")
-    with open(f"new_file_{user_id}.mp4", "rb") as file:
-        await message.answer_video_note(
-            video_note=file,
-            duration=duration
-        )
-    try:
-        os.remove(f"file_{user_id}.mp4")
-        os.remove(f"new_file_{user_id}.mp4")
-    except Exception:
-        pass
+    response = await message.answer("Processing...")
+    with tempfile.NamedTemporaryFile(suffix='.mp4', dir=os.getcwd()) as video:
+        await bot.download_file_by_id(message.video.file_id, video.name)
+        with tempfile.NamedTemporaryFile(suffix='.mp4', dir=os.getcwd()) as out_video:
+            size, duration = crop_video.video_crop(video.name, out_video.name)
+
+            answer = await message.answer_video_note(
+                video_note=out_video.read(),
+                duration=duration
+            )
+            if not answer:
+                await response.edit_text("I can't convert this video, sorry :'(")
+            else:
+                await response.delete()
 
 
 if __name__ == '__main__':
