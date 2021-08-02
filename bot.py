@@ -27,8 +27,17 @@ async def send_welcome(message: types.Message):
     """
     This handler will be called when user sends `/start` or `/help` command
     """
-    await message.reply(("I am a bot, I can convert video messages in video notes.\n\n"
-                         "Please use short videos"))
+    await message.reply(
+        ("*English:* I am a bot, I can convert video messages in video notes.\n"
+         "Send or forward me videos to convert them.\n"
+         "Please use short videos.\n\n"
+         
+         "*Español:* Soy un bot, Puedo convertir videos en notas de video.\n"
+         "Envíame o reenvíame videos para convertirlos.\n"
+         "Por favor usa videos cortos."
+         ),
+        parse_mode="markdown"
+    )
 
 
 @dp.message_handler(content_types=["video"])
