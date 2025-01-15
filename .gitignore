@@ -136,3 +136,7 @@ Pipfile*
 
 # mp4 files
 *.mp4
+
+# poetry .toml
+pyproject.toml
+.vscode
